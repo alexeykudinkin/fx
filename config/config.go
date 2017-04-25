@@ -41,6 +41,7 @@ const (
 const (
 	_appRoot     = "APP_ROOT"
 	_environment = "_ENVIRONMENT"
+	_datacenter  = "_DATACENTER"
 	_configDir   = "_CONFIG_DIR"
 	_configRoot  = "./config"
 	_baseFile    = "base"
@@ -101,7 +102,14 @@ func getConfigFiles(fileSet ...string) []string {
 
 func baseFiles() []string {
 	env := Environment()
-	return []string{_baseFile, env, _secretsFile}
+	dc := os.Getenv(EnvironmentPrefix() + _datacenter)
+
+	baseFiles := []string{_baseFile, env, _secretsFile}
+	if dc != "" && env != "" {
+		baseFiles = append(baseFiles, fmt.Sprintf("%s-%s", env, dc))
+	}
+
+	return baseFiles
 }
 
 func getResolver() FileResolver {
